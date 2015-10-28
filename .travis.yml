@@ -7,6 +7,9 @@ language:
 compiler:
   - gcc
 
+virtualenv:
+  system_site_packages: true
+
 branches:
   only:
     - master
@@ -19,7 +22,7 @@ before_install:
   - sudo apt-get update -qq
 
 install:
-  - sudo apt-get install -y ros-indigo-ros-base ros-indigo-cmake-modules ros-indigo-orocos-kdl ros-indigo-kdl-parser ros-indigo-ros-control ros-indigo-ros-controllers ros-indigo-gazebo4-ros ros-indigo-gazebo4-ros-pkgs python-catkin-pkg
+  - sudo apt-get -qq install ros-indigo-ros-base ros-indigo-cmake-modules ros-indigo-orocos-kdl ros-indigo-kdl-parser ros-indigo-ros-control ros-indigo-ros-controllers ros-indigo-gazebo4-ros ros-indigo-gazebo4-ros-pkgs
 
 before_script:
   - sudo rosdep init
@@ -30,6 +33,10 @@ before_script:
   - ln -s $(pwd) ~/catkin_ws/src/$REPOSITORY_NAME
   - cd ~/catkin_ws/src
   - catkin_init_workspace
+  - printenv | grep python
+  - pyenv install 2.7.6
+  - pyenv global 2.7.6
+  - echo $PYTHONPATH
 
 script:
   - cd ~/catkin_ws/
