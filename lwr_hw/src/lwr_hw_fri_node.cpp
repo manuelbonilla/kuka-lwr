@@ -158,6 +158,8 @@ int main( int argc, char** argv )
 
     // write the command to the lwr
     lwr_robot.write(now, period);
+
+    ros::Duration(sampling_time).sleep();
   }
 
   std::cerr<<"Stopping spinner..."<<std::endl;
