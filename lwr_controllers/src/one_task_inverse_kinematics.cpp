@@ -40,6 +40,7 @@ namespace lwr_controllers
 
         // computing forward kinematics
         fk_pos_solver_->JntToCart(joint_msr_states_.q, x_);
+        fk_pos_solver_->JntToCart(joint_msr_states_.q, x_des_);
 
         //Desired posture is the current one
         x_des_ = x_;
