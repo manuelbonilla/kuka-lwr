@@ -38,6 +38,7 @@ namespace controller_interface
 		KDL::Chain kdl_chain_;
         KDL::Vector gravity_; 
         KDL::JntArrayAcc joint_msr_states_, joint_des_states_;  // joint states (measured and desired)
+        KDL::Tree kdl_tree_;
 
 		struct limits_
 		{
@@ -110,7 +111,7 @@ namespace controller_interface
         }
         ROS_INFO("Successfully parsed urdf file");
         
-        KDL::Tree kdl_tree_;
+        // KDL::Tree kdl_tree_;
         if (!kdl_parser::treeFromUrdfModel(model, kdl_tree_))
         {
             ROS_ERROR("Failed to construct kdl tree");
