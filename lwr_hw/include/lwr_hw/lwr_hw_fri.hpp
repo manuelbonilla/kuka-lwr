@@ -121,7 +121,7 @@ public:
             newJntStiff[j] = 0.0;
         }
         // mirror the position
-        device_->doJntImpedanceControl(device_->getMsrMsrJntPosition(), newJntStiff, NULL, newJntAddTorque, false);
+        device_->doJntImpedanceControl(newJntAddTorque, NULL, NULL, NULL, false);
         break;
 
       case JOINT_STIFFNESS:
