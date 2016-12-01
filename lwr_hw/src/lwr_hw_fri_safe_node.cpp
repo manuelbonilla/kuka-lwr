@@ -11,7 +11,7 @@
 #include <std_msgs/Bool.h>
 
 // the lwr hw fri interface
-#include "lwr_hw/lwr_hw_fri.hpp"
+#include "lwr_hw/lwr_hw_fri_safe.hpp"
 
 bool g_quit = false;
 
@@ -22,9 +22,21 @@ void quitRequested(int sig)
 
 bool isStopPressed = false;
 bool wasStopHandled = true;
+bool emergencyEvent = false;
 void eStopCB(const std_msgs::BoolConstPtr& e_stop_msg)
 {
   isStopPressed = e_stop_msg->data;
+}
+
+void eEventCB(const std_msgs::BoolConstPtr& e_event_msg)
+{
+    emergencyEvent = e_event_msg->data;
+    if(emergencyEvent)
+    {
+        ROS_WARN("E-EVENT HAS OCCURRED: Controllers will be restarted and the robot will be soft");
+        ROS_WARN("TO RELEASE E-EVENT: rostopic pub -r 10 /NAMESPACE/emergency_event std_msgs/Bool 'data: false'");
+    }
+        
 }
 
 // Get the URDF XML from the parameter server
@@ -86,6 +98,7 @@ int main( int argc, char** argv )
 
   // advertise the e-stop topic
   ros::Subscriber estop_sub = lwr_nh.subscribe(lwr_nh.resolveName("emergency_stop"), 1, eStopCB);
+  ros::Subscriber eevent_sub = lwr_nh.subscribe(lwr_nh.resolveName("emergency_event"), 1, eEventCB);
 
   // get the general robot description, the lwr class will take care of parsing what's useful to itself
   std::string urdf_string = getURDF(lwr_nh, "/robot_description");
@@ -113,6 +126,7 @@ int main( int argc, char** argv )
   //the controller manager
   controller_manager::ControllerManager manager(&lwr_robot, lwr_nh);
 
+  bool resetControllers(false);
   // run as fast as the robot interface, or as fast as possible
   ros::Rate rate(1.0/sampling_time);
   while( !g_quit )
@@ -135,7 +149,6 @@ int main( int argc, char** argv )
     lwr_robot.read(now, period);
 
     // Compute the controller commands
-    bool resetControllers;
     if(!wasStopHandled && !resetControllers)
     {
       ROS_WARN("E-STOP HAS BEEN PRESSED: Controllers will be restarted, but the robot won't move until you release the E-Stop");
@@ -155,8 +168,10 @@ int main( int argc, char** argv )
     }    
 
     // update the controllers
-    manager.update(now, period, resetControllers);
+    manager.update(now, period, resetControllers|emergencyEvent); //reset in case of e_stop or e_event
 
+    lwr_robot.setEmergencyEvent(emergencyEvent);
+    
     // write the command to the lwr
     lwr_robot.write(now, period);
 

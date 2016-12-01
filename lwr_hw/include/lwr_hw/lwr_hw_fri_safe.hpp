@@ -29,7 +29,8 @@ public:
   void setPort(int port){port_ = port; port_set_ = true;};
   void setIP(std::string hintToRemoteHost){hintToRemoteHost_ = hintToRemoteHost; ip_set_ = true;};
   float getSampleTime(){return sampling_rate_;};
-
+  bool setEmergencyEvent(bool eevent){std::swap(eevent_,eevent); return eevent;}; // This function sets the emergency event flag
+  
   // Init, read, and write, with FRI hooks
   bool init()
   {
@@ -63,7 +64,6 @@ public:
     std::cout << "FRI Status:\n" << device_->getMsrBuf().intf << std::endl;
     sampling_rate_ = device_->getSampleTime();
     std::cout << "Sampling Rate: " << sampling_rate_ << std::endl;
-
     return true;
   }
 
@@ -118,13 +118,26 @@ public:
       case CARTESIAN_IMPEDANCE:
         for(int i=0; i < 12; ++i)
         {
-          newCartPos[i] = cart_pos_command_[i];
+            if (eevent_) // This is the reaction to an emergency event. For now this sets all variables (stiffness, damping, and ext_torque) to zero, position to the last commanded cartesian position
+                newCartPos[i] = device_->getMsrCartPosition()[i];
+            else
+                newCartPos[i] = cart_pos_command_[i];
         }
         for(int i=0; i < 6; i++)
         {
-          newCartStiff[i] = cart_stiff_command_[i];
-          newCartDamp[i] = cart_damp_command_[i];
-          newAddFT[i] = cart_wrench_command_[i];
+            if(eevent_)
+            {
+                newCartStiff[i] = 0.0;
+                newCartDamp[i] = 0.0;
+                newAddFT[i] = 0.0;
+            }
+            else
+            {
+                newCartStiff[i] = cart_stiff_command_[i];
+                newCartDamp[i] = cart_damp_command_[i];
+                newAddFT[i] = cart_wrench_command_[i];
+            }
+          
         }
         device_->doCartesianImpedanceControl(newCartPos, newCartStiff, newCartDamp, newAddFT, NULL, false);
         break;
@@ -132,36 +145,26 @@ public:
       case JOINT_IMPEDANCE:
         for(int j=0; j < n_joints_; j++)
         {
-          newJntPosition[j] = joint_position_command_[j];
-          newJntAddTorque[j] = joint_effort_command_[j];
-          newJntStiff[j] = joint_stiffness_command_[j];
-          newJntDamp[j] = joint_damping_command_[j];
+          if(eevent_)
+          {
+             // This is the reaction to an emergency event. For now this sets all variables (stiffness, damping, and ext_torque) to zero, position to the last commanded joint position
+              newJntPosition[j] = device_->getMsrMsrJntPosition()[j];
+              newJntAddTorque[j] = 0.0;
+              newJntStiff[j] = 0.0;
+              newJntDamp[j] = 0.0;
+          }
+          else
+          {
+              newJntPosition[j] = joint_position_command_[j];
+              newJntAddTorque[j] = joint_effort_command_[j];
+              newJntStiff[j] = joint_stiffness_command_[j];
+              newJntDamp[j] = joint_damping_command_[j];
+          }
         }
+
         device_->doJntImpedanceControl(newJntPosition, newJntStiff, newJntDamp, newJntAddTorque, false);
         break;
 
-     case JOINT_EFFORT:
-        for(int j=0; j < n_joints_; j++)
-        {
-            newJntAddTorque[j] = joint_effort_command_[j];
-            newJntStiff[j] = 0.0;
-        }
-        // mirror the position
-        device_->doJntImpedanceControl(device_->getMsrMsrJntPosition(), newJntStiff, NULL, newJntAddTorque, false);
-        break;
-
-      case JOINT_STIFFNESS:
-        for(int j=0; j < n_joints_; j++)
-        {
-          newJntPosition[j] = joint_position_command_[j];
-          newJntStiff[j] = joint_stiffness_command_[j];
-        }
-        device_->doJntImpedanceControl(newJntPosition, newJntStiff, NULL, NULL, false);
-        break;
-
-      case GRAVITY_COMPENSATION:
-        device_->doJntImpedanceControl(device_->getMsrMsrJntPosition(), NULL, NULL, NULL, false);
-        break;
     }
     return;
   }
@@ -221,6 +224,7 @@ private:
   bool port_set_ = false;
   std::string hintToRemoteHost_;
   bool ip_set_ = false;
+  bool eevent_ = false; // Variable to manage emergency events, false by default
 
   // low-level interface
   boost::shared_ptr<friRemote> device_;
