@@ -127,6 +127,14 @@ int main( int argc, char** argv )
   controller_manager::ControllerManager manager(&lwr_robot, lwr_nh);
 
   bool resetControllers(false);
+  
+  // variables to trigger an automatic switch to JntImpedance after a short period of time, and no longer allow JntPosition strategy to be used
+  hardware_interface::ControllerInfo c_info;
+  c_info.hardware_interface = std::string("hardware_interface::EffortJointInterface");
+  c_info.name = std::string("name");
+  int count_t = 0;
+  bool had_switch(false);
+
   // run as fast as the robot interface, or as fast as possible
   ros::Rate rate(1.0/sampling_time);
   while( !g_quit )
@@ -171,6 +179,13 @@ int main( int argc, char** argv )
     manager.update(now, period, resetControllers|emergencyEvent); //reset in case of e_stop or e_event
 
     lwr_robot.setEmergencyEvent(emergencyEvent);
+    
+    if(!had_switch && ++count_t > 500)
+    {
+        lwr_robot.doSwitch({c_info}, {});
+        had_switch = true;
+        lwr_robot.setAllowPositionControl(false);
+    }
     
     // write the command to the lwr
     lwr_robot.write(now, period);
