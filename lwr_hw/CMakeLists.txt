@@ -80,6 +80,21 @@ target_link_libraries(lwr_hw_fri_node
   ${catkin_LIBRARIES}
 )
 
+#safe_node
+add_executable(lwr_hw_fri_safe_node  src/lwr_hw_fri_safe_node.cpp
+  include/${PROJECT_NAME}/lwr_hw_fri_safe.hpp
+)
+add_dependencies(lwr_hw_fri_safe_node
+  friremote
+  ${PROJECT_NAME} 
+)
+target_link_libraries(lwr_hw_fri_safe_node
+  friremote
+  ${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+)
+
+
 # Standford FRILibrary (support in PROGRESS)
 message(WARNING "ATTENTION: This project supports the fork of the Standford library found in https://github.com/iocroblab/fril, and install the libraries in your catkin workspace, not in the system")
 include(ExternalProject)
@@ -130,7 +145,7 @@ install(TARGETS ${PROJECT_NAME} lwr_hw_gazebo_plugin friremote
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})
 
-install(TARGETS lwr_hw_fri_node
+install(TARGETS lwr_hw_fri_node lwr_hw_fri_safe_node
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(DIRECTORY launch/
