@@ -132,7 +132,6 @@ int main( int argc, char** argv )
   
   // variables to trigger an automatic switch to JntImpedance after a short period of time, and no longer allow JntPosition strategy to be used
   hardware_interface::ControllerInfo c_info;
-  c_info.hardware_interface = std::string("hardware_interface::EffortJointInterface");
   c_info.name = std::string("name");
   int count_t = 0;
   bool had_switch(false);
@@ -188,9 +187,12 @@ int main( int argc, char** argv )
     
     if(!had_switch && ++count_t > 500)
     {
-        lwr_robot.doSwitch({c_info}, {});
         had_switch = true;
         lwr_robot.setAllowPositionControl(false);
+        c_info.hardware_interface = std::string("hardware_interface::EffortJointInterface");
+        lwr_robot.doSwitch({c_info}, {});
+        c_info.hardware_interface = std::string("hardware_interface::PositionJointInterface");
+        lwr_robot.doSwitch({c_info}, {});
     }
     
     // write the command to the lwr
