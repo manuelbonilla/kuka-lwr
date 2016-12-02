@@ -117,50 +117,57 @@ public:
         break;
 
       case CARTESIAN_IMPEDANCE:
-        for(int i=0; i < 12; ++i)
+        // This is the reaction to an emergency event. For now this sets all variables (stiffness, damping, and ext_force) to zero, position to the last commanded cartesian position
+        if(eevent_)
         {
-            if (eevent_) // This is the reaction to an emergency event. For now this sets all variables (stiffness, damping, and ext_torque) to zero, position to the last commanded cartesian position
+            for(int i=0; i < 12; ++i)
+            {
                 newCartPos[i] = device_->getMsrCartPosition()[i];
-            else
-                newCartPos[i] = cart_pos_command_[i];
-        }
-        for(int i=0; i < 6; i++)
-        {
-            if(eevent_)
+            }
+            for(int i=0; i < 6; i++)
             {
                 newCartStiff[i] = 0.0;
                 newCartDamp[i] = 0.0;
                 newAddFT[i] = 0.0;
             }
-            else
+        }
+        else
+        {
+            for(int i=0; i < 12; ++i)
+            {
+                newCartPos[i] = cart_pos_command_[i];
+            }
+            for(int i=0; i < 6; i++)
             {
                 newCartStiff[i] = cart_stiff_command_[i];
                 newCartDamp[i] = cart_damp_command_[i];
                 newAddFT[i] = cart_wrench_command_[i];
             }
-          
         }
         device_->doCartesianImpedanceControl(newCartPos, newCartStiff, newCartDamp, newAddFT, NULL, false);
         break;
 
       case JOINT_IMPEDANCE:
-        for(int j=0; j < n_joints_; j++)
+        if(eevent_)
         {
-          if(eevent_)
-          {
-             // This is the reaction to an emergency event. For now this sets all variables (stiffness, damping, and ext_torque) to zero, position to the last commanded joint position
-              newJntPosition[j] = device_->getMsrMsrJntPosition()[j];
-              newJntAddTorque[j] = 0.0;
-              newJntStiff[j] = 0.0;
-              newJntDamp[j] = 0.0;
-          }
-          else
-          {
-              newJntPosition[j] = joint_position_command_[j];
-              newJntAddTorque[j] = joint_effort_command_[j];
-              newJntStiff[j] = joint_stiffness_command_[j];
-              newJntDamp[j] = joint_damping_command_[j];
-          }
+            for(int j=0; j < n_joints_; j++)
+            {
+                // This is the reaction to an emergency event. For now this sets all variables (stiffness, damping, and ext_torque) to zero, position to the last commanded joint position
+                newJntPosition[j] = device_->getMsrMsrJntPosition()[j];
+                newJntAddTorque[j] = 0.0;
+                newJntStiff[j] = 0.0;
+                newJntDamp[j] = 0.0;
+            }
+        }
+        else
+        {
+            for(int j=0; j < n_joints_; j++)
+            {
+                newJntPosition[j] = joint_position_command_[j];
+                newJntAddTorque[j] = joint_effort_command_[j];
+                newJntStiff[j] = joint_stiffness_command_[j];
+                newJntDamp[j] = joint_damping_command_[j];
+            }
         }
 
         device_->doJntImpedanceControl(newJntPosition, newJntStiff, newJntDamp, newJntAddTorque, false);
