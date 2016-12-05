@@ -3,12 +3,12 @@
 
 	<!-- utils /-->
 	<xacro:include filename="$(find lwr_description)/model/utils.xacro"/>
-	<xacro:include filename="$(find lwr_description)/model/kuka_materials.xacro"
-	/>
+	<xacro:include filename="$(find lwr_description)/model/kuka_materials.xacro"/>
 
 	<!-- gazebo and transmission models /-->
 	<xacro:include filename="$(find lwr_description)/model/kuka_lwr.gazebo.xacro"/>
 	<xacro:include filename="$(find lwr_description)/model/kuka_lwr.transmission.xacro"/>
+	<xacro:include filename="$(find lwr_description)/model/kuka_lwr.stiffness_damping_addtorque.xacro"/>
 
 	<!-- properties /-->
 	<xacro:property name="base_mass" value="2.0"/>
@@ -17,21 +17,10 @@
     <xacro:property name="tip_mass" value="0.25"/>
 	<xacro:property name="velocity_scale" value="1"/>
 	<xacro:property name="effort_scale" value="1"/>
-
-	<xacro:property name="max_stiffness" value="5000"/>
-	<xacro:property name="min_stiffness" value="0"/>
-	<xacro:property name="rate_stiffness" value="20000"/> <!-- reflex to stiffness -->
-
-	<xacro:property name="max_damping" value="1.0"/>
-	<xacro:property name="min_damping" value="0.0"/>
-	<xacro:property name="rate_damping" value="4.0"/> <!-- reflex to damping -->
-
-	<xacro:property name="max_add_torque" value="-1.0"/>
-	<xacro:property name="min_add_torque" value="1.0"/>
-	<xacro:property name="rate_add_torque" value="8.0"/> <!-- reflex to additional torque -->
+	<xacro:property name="use_extra_joints_default" value="true"/>
 
 	<!-- URDF model /-->
-	<xacro:macro name="kuka_lwr" params="parent name *origin">
+	<xacro:macro name="kuka_lwr" params="parent name *origin use_extra_joints:=${use_extra_joints_default}">
 
 		<!-- First (shoulder) element of the arm. Fixed to its parent. -->
 		<joint name="${parent}_${name}_base_joint" type="fixed">
@@ -71,15 +60,6 @@
 			<parent link="${name}_base_link"/>
 			<child link="${name}_1_link"/>
 		</joint>
-
-		<joint name="${name}_a1_joint_stiffness" type="revolute">
-			<axis xyz="0 0 1"/>
-			<limit lower="${min_stiffness}" upper="${max_stiffness}" effort="0" velocity="${rate_stiffness}" />
-			<safety_controller soft_lower_limit="${min_stiffness}" soft_upper_limit="${max_stiffness}" k_position="30" k_velocity="30"/>
-			<parent link="${name}_base_link"/>
-			<child link="${name}_1_link_dummy"/>
-		</joint>
-		<link name="${name}_1_link_dummy"/>
 
 		<link name="${name}_1_link">
 			<inertial>
@@ -123,15 +103,6 @@
 			<parent link="${name}_1_link"/>
 			<child link="${name}_2_link"/>
 		</joint>
-
-		<joint name="${name}_a2_joint_stiffness" type="revolute">
-			<axis xyz="0 0 1"/>
-			<limit lower="${min_stiffness}" upper="${max_stiffness}" effort="0" velocity="${rate_stiffness}" />
-			<safety_controller soft_lower_limit="${min_stiffness}" soft_upper_limit="${max_stiffness}" k_position="30" k_velocity="30"/>
-			<parent link="${name}_1_link"/>
-			<child link="${name}_2_link_dummy"/>
-		</joint>
-		<link name="${name}_2_link_dummy"/>
 
 		<link name="${name}_2_link">
 			<inertial>
@@ -177,15 +148,6 @@
 			<child link="${name}_3_link"/>
 		</joint>
 
-		<joint name="${name}_e1_joint_stiffness" type="revolute">
-			<axis xyz="0 0 1"/>
-			<limit lower="${min_stiffness}" upper="${max_stiffness}" effort="0" velocity="${rate_stiffness}" />
-			<safety_controller soft_lower_limit="${min_stiffness}" soft_upper_limit="${max_stiffness}" k_position="30" k_velocity="30"/>
-			<parent link="${name}_2_link"/>
-			<child link="${name}_3_link_dummy"/>
-		</joint>
-		<link name="${name}_3_link_dummy"/>
-
 		<link name="${name}_3_link">
 			<inertial>
 				<mass value="${link_mass}"/>
@@ -230,15 +192,6 @@
 			<child link="${name}_4_link"/>
 		</joint>
 
-		<joint name="${name}_a3_joint_stiffness" type="revolute">
-			<axis xyz="0 0 1"/>
-			<limit lower="${min_stiffness}" upper="${max_stiffness}" effort="0" velocity="${rate_stiffness}" />
-			<safety_controller soft_lower_limit="${min_stiffness}" soft_upper_limit="${max_stiffness}" k_position="30" k_velocity="30"/>
-			<parent link="${name}_3_link"/>
-			<child link="${name}_4_link_dummy"/>
-		</joint>
-		<link name="${name}_4_link_dummy"/>
-
 		<link name="${name}_4_link">
 			<inertial>
 				<mass value="${link_mass}"/>
@@ -282,15 +235,6 @@
 			<parent link="${name}_4_link"/>
 			<child link="${name}_5_link"/>
 		</joint>
-
-		<joint name="${name}_a4_joint_stiffness" type="revolute">
-			<axis xyz="0 0 1"/>
-			<limit lower="${min_stiffness}" upper="${max_stiffness}" effort="0" velocity="${rate_stiffness}" />
-			<safety_controller soft_lower_limit="${min_stiffness}" soft_upper_limit="${max_stiffness}" k_position="30" k_velocity="30"/>
-			<parent link="${name}_4_link"/>
-			<child link="${name}_5_link_dummy"/>
-		</joint>
-		<link name="${name}_5_link_dummy"/>
 
 		<link name="${name}_5_link">
 			<inertial>
@@ -337,15 +281,6 @@
 			<child link="${name}_6_link"/>
 		</joint>
 
-		<joint name="${name}_a5_joint_stiffness" type="revolute">
-			<axis xyz="0 0 1"/>
-			<limit lower="${min_stiffness}" upper="${max_stiffness}" effort="0" velocity="${rate_stiffness}" />
-			<safety_controller soft_lower_limit="${min_stiffness}" soft_upper_limit="${max_stiffness}" k_position="30" k_velocity="30"/>
-			<parent link="${name}_5_link"/>
-			<child link="${name}_6_link_dummy"/>
-		</joint>
-		<link name="${name}_6_link_dummy"/>
-
 		<link name="${name}_6_link">
 			<inertial>
 				<mass value="${wrist_mass}"/>
@@ -378,15 +313,6 @@
 			<child link="${name}_7_link"/>
 		</joint>
 
-		<joint name="${name}_a6_joint_stiffness" type="revolute">
-			<axis xyz="0 0 1"/>
-			<limit lower="${min_stiffness}" upper="${max_stiffness}" effort="0" velocity="${rate_stiffness}" />
-			<safety_controller soft_lower_limit="${min_stiffness}" soft_upper_limit="${max_stiffness}" k_position="30" k_velocity="30"/>
-			<parent link="${name}_6_link"/>
-			<child link="${name}_7_link_dummy"/>
-		</joint>
-		<link name="${name}_7_link_dummy"/>
-
 		<link name="${name}_7_link">
 			<inertial>
 				<mass value="${tip_mass}"/>
@@ -411,134 +337,10 @@
 
 		<xacro:kuka_lwr_gazebo name="${name}"/>
 		<xacro:kuka_lwr_transmission name="${name}"/>
+		<xacro:if value = "${use_extra_joints}">
+			<xacro:kuka_lwr_stiffness_damping_addtorque name="${name}"/>
+		</xacro:if>
 
-
-		<!-- fake stuff for damping and set_point -->
-		<joint name="${name}_a1_joint_add_torque" type="revolute">
-			<axis xyz="0 0 1"/>
-			<limit lower="${min_add_torque}" upper="${max_add_torque}" effort="0" velocity="${rate_add_torque}" />
-			<safety_controller soft_lower_limit="${min_add_torque}" soft_upper_limit="${max_add_torque}" k_position="30" k_velocity="30"/>
-			<parent link="${name}_base_link"/>
-			<child link="${name}_1_link_dummy_add_torque"/>
-		</joint>
-		<link name="${name}_1_link_dummy_add_torque"/>
-
-		<joint name="${name}_a2_joint_add_torque" type="revolute">
-			<axis xyz="0 0 1"/>
-			<limit lower="${min_add_torque}" upper="${max_add_torque}" effort="0" velocity="${rate_add_torque}" />
-			<safety_controller soft_lower_limit="${min_add_torque}" soft_upper_limit="${max_add_torque}" k_position="30" k_velocity="30"/>
-			<parent link="${name}_1_link"/>
-			<child link="${name}_2_link_dummy_add_torque"/>
-		</joint>
-		<link name="${name}_2_link_dummy_add_torque"/>
-
-		<joint name="${name}_e1_joint_add_torque" type="revolute">
-			<axis xyz="0 0 1"/>
-			<limit lower="${min_add_torque}" upper="${max_add_torque}" effort="0" velocity="${rate_add_torque}" />
-			<safety_controller soft_lower_limit="${min_add_torque}" soft_upper_limit="${max_add_torque}" k_position="30" k_velocity="30"/>
-			<parent link="${name}_2_link"/>
-			<child link="${name}_3_link_dummy_add_torque"/>
-		</joint>
-		<link name="${name}_3_link_dummy_add_torque"/>
-
-		<joint name="${name}_a3_joint_add_torque" type="revolute">
-			<axis xyz="0 0 1"/>
-			<limit lower="${min_add_torque}" upper="${max_add_torque}" effort="0" velocity="${rate_add_torque}" />
-			<safety_controller soft_lower_limit="${min_add_torque}" soft_upper_limit="${max_add_torque}" k_position="30" k_velocity="30"/>
-			<parent link="${name}_3_link"/>
-			<child link="${name}_4_link_dummy_add_torque"/>
-		</joint>
-		<link name="${name}_4_link_dummy_add_torque"/>
-
-		<joint name="${name}_a4_joint_add_torque" type="revolute">
-			<axis xyz="0 0 1"/>
-			<limit lower="${min_add_torque}" upper="${max_add_torque}" effort="0" velocity="${rate_add_torque}" />
-			<safety_controller soft_lower_limit="${min_add_torque}" soft_upper_limit="${max_add_torque}" k_position="30" k_velocity="30"/>
-			<parent link="${name}_4_link"/>
-			<child link="${name}_5_link_dummy_add_torque"/>
-		</joint>
-		<link name="${name}_5_link_dummy_add_torque"/>
-
-		<joint name="${name}_a5_joint_add_torque" type="revolute">
-			<axis xyz="0 0 1"/>
-			<limit lower="${min_add_torque}" upper="${max_add_torque}" effort="0" velocity="${rate_add_torque}" />
-			<safety_controller soft_lower_limit="${min_add_torque}" soft_upper_limit="${max_add_torque}" k_position="30" k_velocity="30"/>
-			<parent link="${name}_5_link"/>
-			<child link="${name}_6_link_dummy_add_torque"/>
-		</joint>
-		<link name="${name}_6_link_dummy_add_torque"/>
-
-		<joint name="${name}_a6_joint_add_torque" type="revolute">
-			<axis xyz="0 0 1"/>
-			<limit lower="${min_add_torque}" upper="${max_add_torque}" effort="0" velocity="${rate_add_torque}" />
-			<safety_controller soft_lower_limit="${min_add_torque}" soft_upper_limit="${max_add_torque}" k_position="30" k_velocity="30"/>
-			<parent link="${name}_6_link"/>
-			<child link="${name}_7_link_dummy_add_torque"/>
-		</joint>
-		<link name="${name}_7_link_dummy_add_torque"/>
-
-		<joint name="${name}_a1_joint_damping" type="revolute">
-			<axis xyz="0 0 1"/>
-			<limit lower="${min_damping}" upper="${max_damping}" effort="0" velocity="${rate_damping}" />
-			<safety_controller soft_lower_limit="${min_damping}" soft_upper_limit="${max_damping}" k_position="30" k_velocity="30"/>
-			<parent link="${name}_base_link"/>
-			<child link="${name}_1_link_dummy_damping"/>
-		</joint>
-		<link name="${name}_1_link_dummy_damping"/>
-
-		<joint name="${name}_a2_joint_damping" type="revolute">
-			<axis xyz="0 0 1"/>
-			<limit lower="${min_damping}" upper="${max_damping}" effort="0" velocity="${rate_damping}" />
-			<safety_controller soft_lower_limit="${min_damping}" soft_upper_limit="${max_damping}" k_position="30" k_velocity="30"/>
-			<parent link="${name}_1_link"/>
-			<child link="${name}_2_link_dummy_damping"/>
-		</joint>
-		<link name="${name}_2_link_dummy_damping"/>
-
-		<joint name="${name}_e1_joint_damping" type="revolute">
-			<axis xyz="0 0 1"/>
-			<limit lower="${min_damping}" upper="${max_damping}" effort="0" velocity="${rate_damping}" />
-			<safety_controller soft_lower_limit="${min_damping}" soft_upper_limit="${max_damping}" k_position="30" k_velocity="30"/>
-			<parent link="${name}_2_link"/>
-			<child link="${name}_3_link_dummy_damping"/>
-		</joint>
-		<link name="${name}_3_link_dummy_damping"/>
-
-		<joint name="${name}_a3_joint_damping" type="revolute">
-			<axis xyz="0 0 1"/>
-			<limit lower="${min_damping}" upper="${max_damping}" effort="0" velocity="${rate_damping}" />
-			<safety_controller soft_lower_limit="${min_damping}" soft_upper_limit="${max_damping}" k_position="30" k_velocity="30"/>
-			<parent link="${name}_3_link"/>
-			<child link="${name}_4_link_dummy_damping"/>
-		</joint>
-		<link name="${name}_4_link_dummy_damping"/>
-
-		<joint name="${name}_a4_joint_damping" type="revolute">
-			<axis xyz="0 0 1"/>
-			<limit lower="${min_damping}" upper="${max_damping}" effort="0" velocity="${rate_damping}" />
-			<safety_controller soft_lower_limit="${min_damping}" soft_upper_limit="${max_damping}" k_position="30" k_velocity="30"/>
-			<parent link="${name}_4_link"/>
-			<child link="${name}_5_link_dummy_damping"/>
-		</joint>
-		<link name="${name}_5_link_dummy_damping"/>
-
-		<joint name="${name}_a5_joint_damping" type="revolute">
-			<axis xyz="0 0 1"/>
-			<limit lower="${min_damping}" upper="${max_damping}" effort="0" velocity="${rate_damping}" />
-			<safety_controller soft_lower_limit="${min_damping}" soft_upper_limit="${max_damping}" k_position="30" k_velocity="30"/>
-			<parent link="${name}_5_link"/>
-			<child link="${name}_6_link_dummy_damping"/>
-		</joint>
-		<link name="${name}_6_link_dummy_damping"/>
-
-		<joint name="${name}_a6_joint_damping" type="revolute">
-			<axis xyz="0 0 1"/>
-			<limit lower="${min_damping}" upper="${max_damping}" effort="0" velocity="${rate_damping}" />
-			<safety_controller soft_lower_limit="${min_damping}" soft_upper_limit="${max_damping}" k_position="30" k_velocity="30"/>
-			<parent link="${name}_6_link"/>
-			<child link="${name}_7_link_dummy_damping"/>
-		</joint>
-		<link name="${name}_7_link_dummy_damping"/>
 
 	</xacro:macro>
 
