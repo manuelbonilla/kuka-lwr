@@ -85,7 +85,8 @@ public:
       joint_position_prev_[j] = joint_position_[j];
       joint_position_[j] = device_->getMsrMsrJntPosition()[j];
       joint_position_kdl_(j) = joint_position_[j];
-      joint_effort_[j] = device_->getMsrJntTrq()[j];
+      // joint_effort_[j] = device_->getMsrJntTrq()[j];
+      joint_effort_[j] = joint_effort_command_[j];
       joint_velocity_[j] = filters::exponentialSmoothing((joint_position_[j]-joint_position_prev_[j])/period.toSec(), joint_velocity_[j], 0.2);
       joint_stiffness_[j] = joint_stiffness_command_[j];
       joint_damping_[j] = joint_damping_command_[j];

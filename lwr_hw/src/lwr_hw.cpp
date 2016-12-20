@@ -216,6 +216,13 @@ namespace lwr_hw
                                                                    &joint_position_[j], &joint_velocity_[j], &joint_effort_[j]),
                                                        &joint_set_point_command_[j]);
       effort_interface_.registerHandle(joint_handle_set_point);
+      
+      hardware_interface::JointHandle joint_handle_add_torque;
+      joint_handle_add_torque = hardware_interface::JointHandle(hardware_interface::JointStateHandle(
+                                                                   joint_names_[j]+std::string("_add_torque"),
+                                                                   &joint_effort_[j], &joint_effort_[j], &joint_effort_[j]),
+                                                       &joint_effort_command_[j]);
+      position_interface_.registerHandle(joint_handle_add_torque);
 
       // the stiffness is not actually a different joint, so the state handle is only used for handle
       hardware_interface::JointHandle joint_handle_stiffness;
@@ -223,14 +230,15 @@ namespace lwr_hw
                                                                    joint_names_[j]+std::string("_stiffness"),
                                                                    &joint_stiffness_[j], &joint_stiffness_[j], &joint_stiffness_[j]),
                                                        &joint_stiffness_command_[j]);
-      //position_interface_.registerHandle(joint_handle_stiffness);
+      position_interface_.registerHandle(joint_handle_stiffness);
       effort_interface_.registerHandle(joint_handle_stiffness);
       
       hardware_interface::JointHandle joint_handle_damping;
       joint_handle_damping = hardware_interface::JointHandle(hardware_interface::JointStateHandle(
                                                                     joint_names_[j]+std::string("_damping"),  
                                                                     &joint_damping_[j], &joint_damping_[j], &joint_damping_[j]),
-                                                                    &joint_damping_command_[j]);
+                                                             &joint_damping_command_[j]);
+      position_interface_.registerHandle(joint_handle_damping);
       effort_interface_.registerHandle(joint_handle_damping);
    
      // velocity command handle, recall it is fake, there is no actual velocity interface
@@ -402,6 +410,7 @@ namespace lwr_hw
     pj_sat_interface_.enforceLimits(period);
     pj_limits_interface_.enforceLimits(period);
     sj_sat_interface_.enforceLimits(period);
+    // TODO: the following seem unset... make use of them, and add Cartesian limits handling
     sj_limits_interface_.enforceLimits(period);
     dj_sat_interface_.enforceLimits(period);
     dj_limits_interface_.enforceLimits(period);
