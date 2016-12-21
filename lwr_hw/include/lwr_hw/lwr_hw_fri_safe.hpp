@@ -23,13 +23,23 @@ class LWRHWFRI : public LWRHW
 
 public:
 
-  LWRHWFRI() : LWRHW() {}
+  LWRHWFRI() : LWRHW() { }
+
   ~LWRHWFRI() { stopKRCComm_ = true; KRCCommThread_.get()->join();}
 
   void setPort(int port){port_ = port; port_set_ = true;};
   void setIP(std::string hintToRemoteHost){hintToRemoteHost_ = hintToRemoteHost; ip_set_ = true;};
   float getSampleTime(){return sampling_rate_;};
-  bool setEmergencyEvent(bool eevent){std::swap(eevent_,eevent); return eevent;}; // This function sets the emergency event flag
+  // This function sets the emergency event flag
+  bool setEmergencyEvent(bool eevent)
+  {
+      std::swap(eevent_,eevent);
+      if(!eevent)
+      {
+          emergency_scaling_factor = 1.0;
+      }
+      return eevent;
+  };
   bool setAllowPositionControl(bool b_in){std::swap(allow_position_control_,b_in); return b_in;}; // This function sets the allow position control flag
   
   // Init, read, and write, with FRI hooks
@@ -118,10 +128,11 @@ public:
             }
             for(int i=0; i < 6; i++)
             {
-                newCartStiff[i] = 0.0;
+                newCartStiff[i] = emergency_scaling_factor*cart_stiff_command_[i];
                 newCartDamp[i] = 0.0;
                 newAddFT[i] = 0.0;
             }
+            emergency_scaling_factor *= 0.98175; // from 1000.0 to 0.1 in 500 runs
         }
         else
         {
@@ -162,11 +173,13 @@ public:
             for(int j=0; j < n_joints_; j++)
             {
                 // This is the reaction to an emergency event. For now this sets all variables (stiffness, damping, and ext_torque) to zero, position to the last commanded joint position
-                newJntPosition[j] = device_->getMsrMsrJntPosition()[j];
                 newJntAddTorque[j] = 0.0;
-                newJntStiff[j] = 0.0;
-                newJntDamp[j] = 0.0;
+                // using an extra variable because the command could increase with time, in principle faster than the scaling factor
+                newJntStiff[j] = emergency_scaling_factor*joint_stiffness_command_[j];
+                newJntDamp[j] = 0.7;
             }
+            emergency_scaling_factor *= 0.98175; // from 1000.0 to 0.1 in 500 runs
+            device_->getCurrentCmdJntPosition(newJntPosition); // both position command and offset
         }
         else
         {
@@ -178,7 +191,7 @@ public:
                 newJntDamp[j] = joint_damping_command_[j];
             }
         }
-
+        
         device_->doJntImpedanceControl(newJntPosition, newJntStiff, newJntDamp, newJntAddTorque, false);
         break;
 
@@ -252,6 +265,7 @@ private:
   bool ip_set_ = false;
   bool eevent_ = false; // Variable to manage emergency events, false by default
   bool allow_position_control_ = true;
+  double emergency_scaling_factor; // Scale the stiffness in case of an emergency event, making it smooth to transition from the current to a 0 stiffness value
 
   // low-level interface
   boost::shared_ptr<friRemote> device_;
