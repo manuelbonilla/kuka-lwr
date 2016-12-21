@@ -108,14 +108,6 @@ public:
 
     switch (getControlStrategy())
     {
-      case JOINT_POSITION:
-        for (int j = 0; j < n_joints_; j++)
-        {
-          newJntPosition[j] = joint_position_command_[j];
-        }
-        device_->doPositionControl(newJntPosition, false);
-        break;
-
       case CARTESIAN_IMPEDANCE:
         // This is the reaction to an emergency event. For now this sets all variables (stiffness, damping, and ext_force) to zero, position to the last commanded cartesian position
         if(eevent_)
@@ -146,6 +138,23 @@ public:
         }
         device_->doCartesianImpedanceControl(newCartPos, newCartStiff, newCartDamp, newAddFT, NULL, false);
         break;
+
+        
+      case JOINT_POSITION:
+        for (int j = 0; j < n_joints_; j++)
+        {
+            newJntPosition[j] = joint_position_command_[j];
+            joint_set_point_command_[j] = joint_position_command_[j];
+        }
+        if(allow_position_control_)
+        {
+            device_->doPositionControl(newJntPosition, false);
+            break;
+        }
+        else
+        {
+            // do joint_impedance control instead...
+        }
 
       case JOINT_IMPEDANCE:
         if(eevent_)
@@ -187,7 +196,6 @@ public:
     if(JOINT_POSITION == desired_strategy && !allow_position_control_)
     {
         std::cout << "You are no longer allowed to use Position Control. Using instead Joint Impedance Control. Safety first!" << std::endl;
-        desired_strategy = JOINT_IMPEDANCE;
     }
 
     for (int j = 0; j < n_joints_; ++j)
@@ -216,8 +224,10 @@ public:
       stopFRI();
 
       // send to KRL the new strategy
-      if( desired_strategy == JOINT_POSITION )
+      if( desired_strategy == JOINT_POSITION && allow_position_control_ )
         device_->setToKRLInt(0, JOINT_POSITION);
+      else if( desired_strategy == JOINT_POSITION && !allow_position_control_ )
+        device_->setToKRLInt(0, JOINT_IMPEDANCE);
       else if( desired_strategy == JOINT_IMPEDANCE)
         device_->setToKRLInt(0, JOINT_IMPEDANCE);
       else if( desired_strategy == CARTESIAN_IMPEDANCE)
@@ -228,6 +238,8 @@ public:
 
       setControlStrategy(desired_strategy);
       std::cout << "The ControlStrategy changed to: " << getControlStrategy() << std::endl;
+      if(!allow_position_control_ && desired_strategy == JOINT_POSITION)
+          std::cout << "ATTENTION: in the safe interface, switching to JOINT_POSITION is not allowed! Using JOINT_IMPEDANCE on the robot instead, your commands will be forwarded..." << std::endl;
     }
   }
 
