@@ -189,10 +189,19 @@ int main( int argc, char** argv )
     {
         had_switch = true;
         lwr_robot.setAllowPositionControl(false);
+#if ROS_VERSION_MINIMUM(1,12,6)
+        c_info.claimed_resources.clear();
+        c_info.claimed_resources.emplace_back(hardware_interface::InterfaceResources(std::string("hardware_interface::EffortJointInterface"),{}));
+        lwr_robot.doSwitch({c_info}, {});
+        c_info.claimed_resources.clear();
+        c_info.claimed_resources.emplace_back(hardware_interface::InterfaceResources(std::string("hardware_interface::PositionJointInterface"),{}));
+        lwr_robot.doSwitch({c_info}, {});
+#else
         c_info.hardware_interface = std::string("hardware_interface::EffortJointInterface");
         lwr_robot.doSwitch({c_info}, {});
         c_info.hardware_interface = std::string("hardware_interface::PositionJointInterface");
         lwr_robot.doSwitch({c_info}, {});
+#endif
     }
     
     // write the command to the lwr
