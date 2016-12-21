@@ -23,6 +23,7 @@ void quitRequested(int sig)
 bool isStopPressed = false;
 bool wasStopHandled = true;
 bool emergencyEvent = false;
+bool emergencyStatusChanged = false;
 void eStopCB(const std_msgs::BoolConstPtr& e_stop_msg)
 {
   isStopPressed = e_stop_msg->data;
@@ -30,6 +31,7 @@ void eStopCB(const std_msgs::BoolConstPtr& e_stop_msg)
 
 void eEventCB(const std_msgs::BoolConstPtr& e_event_msg)
 {
+    emergencyStatusChanged = emergencyEvent!=e_event_msg->data;
     emergencyEvent = e_event_msg->data;
     if(emergencyEvent)
     {
@@ -176,9 +178,13 @@ int main( int argc, char** argv )
     }    
 
     // update the controllers
-    manager.update(now, period, resetControllers|emergencyEvent); //reset in case of e_stop or e_event
-
-    lwr_robot.setEmergencyEvent(emergencyEvent);
+    manager.update(now, period, resetControllers|emergencyStatusChanged); //reset in case of e_stop or e_event
+    if(emergencyStatusChanged)
+    {
+        std::cout << "lwr_hw node status changed" << std::endl;
+        emergencyStatusChanged =  false;
+        lwr_robot.setEmergencyEvent(emergencyEvent);
+    }
     
     if(!had_switch && ++count_t > 500)
     {

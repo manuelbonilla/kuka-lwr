@@ -30,6 +30,7 @@ public:
   void setIP(std::string hintToRemoteHost){hintToRemoteHost_ = hintToRemoteHost; ip_set_ = true;};
   float getSampleTime(){return sampling_rate_;};
   bool setEmergencyEvent(bool eevent){std::swap(eevent_,eevent); return eevent;}; // This function sets the emergency event flag
+  bool setAllowPositionControl(bool b_in){std::swap(allow_position_control_,b_in); return b_in;}; // This function sets the allow position control flag
   
   // Init, read, and write, with FRI hooks
   bool init()
@@ -172,9 +173,15 @@ public:
   void doSwitch(const std::list<hardware_interface::ControllerInfo> &start_list, const std::list<hardware_interface::ControllerInfo> &stop_list)
   {
     // at this point, we now that there is only one controller that ones to command joints
-    ControlStrategy desired_strategy = JOINT_POSITION; // default
+    ControlStrategy desired_strategy = JOINT_IMPEDANCE; // default
 
     desired_strategy = getNewControlStrategy(start_list,stop_list,desired_strategy);
+
+    if(JOINT_POSITION == desired_strategy && !allow_position_control_)
+    {
+        std::cout << "You are no longer allowed to use Position Control. Using instead Joint Impedance Control. Safety first!" << std::endl;
+        desired_strategy = JOINT_IMPEDANCE;
+    }
 
     for (int j = 0; j < n_joints_; ++j)
     {
@@ -225,6 +232,7 @@ private:
   std::string hintToRemoteHost_;
   bool ip_set_ = false;
   bool eevent_ = false; // Variable to manage emergency events, false by default
+  bool allow_position_control_ = true;
 
   // low-level interface
   boost::shared_ptr<friRemote> device_;
