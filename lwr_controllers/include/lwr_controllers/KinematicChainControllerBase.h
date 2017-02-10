@@ -156,7 +156,12 @@ namespace controller_interface
         for (int i = 0; i < kdl_chain_.getNrOfJoints() && link_; i++)
         {
             joint_ = model.getJoint(link_->parent_joint->name);  
-            ROS_INFO("Getting limits for joint: %s", joint_->name.c_str());
+            ROS_INFO_STREAM("Joint type = " << joint_->type);
+            if ( joint_->type == 6 )
+            {
+                continue;
+            }
+            ROS_INFO("Getting limits for joint %s", joint_->name.c_str());
             index = kdl_chain_.getNrOfJoints() - i - 1;
 
             joint_limits_.min(index) = joint_->limits->lower;

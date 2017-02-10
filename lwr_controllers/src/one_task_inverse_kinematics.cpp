@@ -8,6 +8,7 @@
 #include <Eigen/LU>
 
 #include <math.h>
+#include <kdl/frames_io.hpp>
 
 namespace lwr_controllers 
 {
@@ -75,6 +76,9 @@ namespace lwr_controllers
 
             // computing forward kinematics
             fk_pos_solver_->JntToCart(joint_msr_states_.q, x_);
+
+
+            std::cout << "x_" << x_ << std::endl;
 
             // end-effector position error
             x_err_.vel = x_des_.p - x_.p;

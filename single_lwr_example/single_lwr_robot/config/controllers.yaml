@@ -2,7 +2,7 @@ lwr:
   # CONTROLLERS USED IN THE EXAMPLE
   joint_state_controller:
     type: joint_state_controller/JointStateController
-    publish_rate: 100  
+    publish_rate: 500 
 
   # THIS CONFIGURATION IS ACTUALLY SENDING TAU = K*Q
   joint_trajectory_controller:
@@ -38,7 +38,7 @@ lwr:
       - lwr_a5_joint_damping
       - lwr_a6_joint_damping
 
-  additional_torque_trajectory_controller:
+  add_torque_trajectory_controller:
     type: position_controllers/JointTrajectoryController
     joints:
       - lwr_a1_joint_add_torque
@@ -66,8 +66,6 @@ lwr:
     type: lwr_controllers/JointImpedanceController
     root_name: lwr_base_link
     tip_name: lwr_7_link
-    stiffness_gains: 300
-    damping_gains: .7
 
   # Inverse Dynamics Controllers
   inverse_dynamics_controller:
@@ -91,6 +89,11 @@ lwr:
   cartesian_impedance_controller:
     type: lwr_controllers/CartesianImpedanceController
     robot_name: lwr
+    root_name: lwr_base_link
+    tip_name: lwr_7_link
+
+  fphic:
+    type: fphic_controllers/fphic
     root_name: lwr_base_link
     tip_name: lwr_7_link
 

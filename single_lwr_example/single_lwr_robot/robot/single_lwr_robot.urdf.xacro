@@ -29,12 +29,12 @@
 	</link>
 
 	<gazebo reference="box">
-		<static>true</static>>
+		<static>true</static>
 	</gazebo>
 
 	<!-- using the models -->
 	<xacro:kuka_lwr parent="box" name="lwr">
-		<origin xyz="0 0 1" rpy="0 0 0"/>
+		<origin xyz="0 0 1" rpy="0 0.45 0"/>
 	</xacro:kuka_lwr>
 
 </robot>
