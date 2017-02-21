@@ -34,6 +34,13 @@ public:
     }
 
     gazebo::physics::JointPtr joint;
+    ignition::math::Vector3d gr = parent_model_->GetWorld()->Gravity();
+    KDL::Vector gr_m = KDL::Vector::Zero();
+    gr_m(0) = gr[0];
+    gr_m(1) = gr[1];
+    gr_m(2) = gr[2];
+    std::cout << "Using Gravity vector g(" << gr_m(0) << "," << gr_m(1) << "," << gr_m(2) << ")" << std::endl;
+    f_dyn_solver_.reset(new KDL::ChainDynParam(lwr_chain_, gr_m));
     for(int j=0; j < n_joints_; j++)
     {
       joint = parent_model_->GetJoint(joint_names_[j]);
