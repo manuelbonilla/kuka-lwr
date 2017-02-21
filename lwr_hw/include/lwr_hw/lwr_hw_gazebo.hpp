@@ -121,6 +121,15 @@ public:
           sim_joints_[j]->SetForce(0, effort);
         }
         break;
+      for (int j = 0; j < n_joints_; j++)
+      {
+        // replicate the joint impedance control strategy
+        // tau = k (q_FRI - q_msr) + tau_FRI + D(q_msr) + f_dyn(q_msr)
+        const double stiffness_effort = joint_stiffness_command_[j] * (joint_position_command_[j] - joint_position_[j]);
+        const double damping_effort =  joint_damping_command_[j] * (- joint_velocity_[j]);
+        const double effort = stiffness_effort + damping_effort + gravity_effort_(j) + joint_effort_command_[j];
+        sim_joints_[j]->SetForce(0, effort);
+      }
 
       case GRAVITY_COMPENSATION:
         ROS_WARN("CARTESIAN IMPEDANCE NOT IMPLEMENTED");
