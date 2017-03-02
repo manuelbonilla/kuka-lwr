@@ -144,7 +144,9 @@ public:
   cart_pos_command_,
   cart_stiff_command_,
   cart_damp_command_,
-  cart_wrench_command_;
+  cart_wrench_command_,
+  inertia_matrix_,
+  inertia_matrix_fake_;
 
   // NOTE:
   // joint_velocity_command is not really to command the kuka arm in velocity,
