@@ -327,12 +327,12 @@
 			<material name="Kuka/DarkGrey"/>
 			</visual>
 
-			<collision>
+<!-- 			<collision>
 			<origin xyz="0 0 0" rpy="0 0 ${M_PI}"/>
 			<geometry>
 				<cylinder radius="0.04" length="0.05"/>
 			</geometry>
-			</collision>
+			</collision> -->
 		</link>
 
 		<xacro:kuka_lwr_gazebo name="${name}"/>
