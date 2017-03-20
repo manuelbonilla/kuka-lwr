@@ -112,7 +112,7 @@ namespace lwr_hw
       joint_set_point_command_[j] = 0.0;
       joint_velocity_command_[j] = 0.0;
       joint_effort_command_[j] = 0.0;
-      joint_stiffness_command_[j] = 1000.0;
+      joint_stiffness_command_[j] = 2000.0;
       joint_damping_command_[j] = 0.7;
     }
 
