@@ -140,8 +140,8 @@ namespace lwr_controllers
         tf::wrenchMsgToKDL( msg->f_FRI, f_des_ );
 
         // Convert from Stiffness msg array to KDL stiffness
-        //if(!(msg->k_FRI.x + msg->k_FRI.y + msg->k_FRI.z + msg->k_FRI.rx + msg->k_FRI.ry + msg->k_FRI.rz == 0.0))
-        //{
+        if(!(msg->k_FRI.x + msg->k_FRI.y + msg->k_FRI.z + msg->k_FRI.rx + msg->k_FRI.ry + msg->k_FRI.rz == 0.0))
+        {
             ROS_INFO("Updating Stiffness command");
             KDL::Stiffness k( msg->k_FRI.x, msg->k_FRI.y, msg->k_FRI.z, msg->k_FRI.rx, msg->k_FRI.ry, msg->k_FRI.rz );
             k_des_ = k;
@@ -149,7 +149,7 @@ namespace lwr_controllers
             ROS_INFO("Updating Damping command");
             KDL::Stiffness d( msg->d_FRI.x, msg->d_FRI.y, msg->d_FRI.z, msg->d_FRI.rx, msg->d_FRI.ry, msg->d_FRI.rz );
             d_des_ = d;
-        //}
+        }
 
         // publishe goal
         geometry_msgs::PoseStamped goal;

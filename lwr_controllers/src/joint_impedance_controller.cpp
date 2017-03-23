@@ -82,7 +82,7 @@ void JointImpedanceController::update(const ros::Time& time, const ros::Duration
 
 void JointImpedanceController::command(const std_msgs::Float64MultiArray::ConstPtr &msg) {
     if (msg->data.size() == 0) {
-        ROS_INFO("Desired configuration must be: %lu dimension", joint_handles_.size());
+        ROS_DEBUG("Desired configuration must be: %lu dimension", joint_handles_.size());
     }
     else if ((int)msg->data.size() != joint_handles_.size()) {
         ROS_ERROR("Posture message had the wrong size: %d", (int)msg->data.size());
@@ -107,12 +107,12 @@ void JointImpedanceController::setParam(const std_msgs::Float64MultiArray_< std:
     }
     else
     {
-        ROS_INFO("Num of Joint handles = %lu", joint_handles_.size());
+        ROS_INFO("Num of Joint handles should be = %lu", joint_handles_.size());
     }
 
-    ROS_INFO("Num of Joint handles = %lu, dimension of message = %lu", joint_handles_.size(), msg->data.size());
+    ROS_DEBUG("Num of Joint handles = %lu, dimension of message = %lu", joint_handles_.size(), msg->data.size());
 
-    ROS_INFO("New param %s: %.2lf, %.2lf, %.2lf %.2lf, %.2lf, %.2lf, %.2lf", s.c_str(),
+    ROS_DEBUG("New param %s: %.2lf, %.2lf, %.2lf %.2lf, %.2lf, %.2lf, %.2lf", s.c_str(),
              (*array)(0), (*array)(1), (*array)(2), (*array)(3), (*array)(4), (*array)(5), (*array)(6));
 }
 
