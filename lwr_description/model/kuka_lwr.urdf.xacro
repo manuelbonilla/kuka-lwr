@@ -18,6 +18,7 @@
 	<xacro:property name="velocity_scale" value="1"/>
 	<xacro:property name="effort_scale" value="1"/>
 	<xacro:property name="use_extra_joints_default" value="true"/>
+	<xacro:property name="inertia_scale" value="10000000"/>
 
 	<!-- URDF model /-->
 	<xacro:macro name="kuka_lwr" params="parent name *origin use_extra_joints:=${use_extra_joints_default}">
@@ -56,7 +57,7 @@
 			<origin xyz="0 0 0.11" rpy="0 0 0"/>
 			<axis xyz="0 0 1"/>
 			<limit lower="${-170 * M_PI / 180}" upper="${170 * M_PI / 180}" effort="176" velocity="${velocity_scale * 110 * M_PI / 180}" />
-			<dynamics friction="10.0" damping="1.0"/>
+			<dynamics friction="1.0" damping="0.7"/>
 			<parent link="${name}_base_link"/>
 			<child link="${name}_1_link"/>
 		</joint>
@@ -64,8 +65,8 @@
 		<link name="${name}_1_link">
 			<inertial>
 				<mass value="${link_mass}"/>
-				<origin rpy="0 0 0" xyz="0 -0.06 0.130"/>
-				<cuboid_inertia_def length="0.12" width="0.06" height="0.260" mass="${link_mass}"/>
+				<origin rpy="0 0 0" xyz="0.00000301 0.02391176 0.11939403"/>
+			    <inertia ixx="${136938.093750 / inertia_scale}" ixy="${4.968005 / inertia_scale}" ixz="${8.730822 / inertia_scale}" iyy="${135390.187500 / inertia_scale}" iyz="${-23715.781250 / inertia_scale}" izz="${40896.656250 / inertia_scale}" />
 			</inertial>
 			<visual>
 				<origin xyz="0 0 -0.008" rpy="0 0 ${M_PI}"/>
@@ -99,7 +100,7 @@
 			<origin xyz="0 0 0.2005" rpy="0 0 0"/>
 			<axis xyz="0 -1 0"/>
 			<limit lower="${-120 * M_PI / 180}" upper="${120 * M_PI / 180}" effort="176" velocity="${velocity_scale * 110 * M_PI / 180}" />
-			<dynamics friction="10.0" damping="1.0"/>
+			<dynamics friction="1.0" damping="0.7"/>
 			<parent link="${name}_1_link"/>
 			<child link="${name}_2_link"/>
 		</joint>
@@ -107,10 +108,9 @@
 		<link name="${name}_2_link">
 			<inertial>
 				<mass value="${link_mass}"/>
-				<origin rpy="0 0 0" xyz="0 0.06 ${0.130 - 0.06}"/>
-				<cuboid_inertia_def length="0.12" width="0.06" height="0.260" mass="${link_mass}"/>
+				<origin rpy="0 0 0" xyz="0.00000301 -0.02391175 0.08110597"/>
+			    <inertia ixx="${136938.093750 / inertia_scale}" ixy="${-4.968005 / inertia_scale}" ixz="${-8.730822 / inertia_scale}" iyy="${135390.187500 / inertia_scale}" iyz="${-23715.781250 / inertia_scale}" izz="${40896.656250 / inertia_scale}" />
 			</inertial>
-
 			<visual>
 				<origin xyz="0 0 0.0" rpy="0 0 ${M_PI}"/>
 				<geometry>
@@ -143,7 +143,7 @@
 			<origin xyz="0 0 0.20" rpy="0 0 0"/>
 			<axis xyz="0 0 1"/>
 			<limit lower="${-170 * M_PI / 180}" upper="${170 * M_PI / 180}" effort="100" velocity="${velocity_scale * 128 * M_PI / 180}" />
-			<dynamics friction="10.0" damping="1.0"/>
+			<dynamics friction="1.0" damping="0.7"/>
 			<parent link="${name}_2_link"/>
 			<child link="${name}_3_link"/>
 		</joint>
@@ -151,10 +151,9 @@
 		<link name="${name}_3_link">
 			<inertial>
 				<mass value="${link_mass}"/>
-				<origin rpy="0 0 0" xyz="0 0.06 0.130"/>
-				<cuboid_inertia_def length="0.12" width="0.06" height="0.260" mass="${link_mass}"/>
+				<origin rpy="0 0 0" xyz="-0.00000302 -.02391175 0.11939403"/>
+			    <inertia ixx="${136938.093750 / inertia_scale}" ixy="${4.968005 / inertia_scale}" ixz="${-8.730822 / inertia_scale}" iyy="${135390.187500 / inertia_scale}" iyz="${23715.781250 / inertia_scale}" izz="${40896.656250 / inertia_scale}" />
 			</inertial>
-
 			<visual>
 				<origin xyz="0 0 -0.008" rpy="0 0 ${M_PI}"/>
 				<geometry>
@@ -187,7 +186,7 @@
 			<origin xyz="0 0 0.20" rpy="0 0 0"/>
 			<axis xyz="0 1 0"/>
 			<limit lower="${-120 * M_PI / 180}" upper="${120 * M_PI / 180}" effort="100" velocity="${velocity_scale * 128 * M_PI / 180}" />
-			<dynamics friction="10.0" damping="1.0"/>
+			<dynamics friction="1.0" damping="0.7"/>
 			<parent link="${name}_3_link"/>
 			<child link="${name}_4_link"/>
 		</joint>
@@ -195,10 +194,9 @@
 		<link name="${name}_4_link">
 			<inertial>
 				<mass value="${link_mass}"/>
-				<origin rpy="0 0 0" xyz="0 -0.06 ${0.130 - 0.06}"/>
-				<cuboid_inertia_def length="0.12" width="0.06" height="0.2600" mass="${link_mass}"/>
+				<origin rpy="0 0 0" xyz="-0.00000303 .02391175 0.08110597"/>
+			    <inertia ixx="${136938.093750 / inertia_scale}" ixy="${-4.968005 / inertia_scale}" ixz="${8.730822 / inertia_scale}" iyy="${135390.187500 / inertia_scale}" iyz="${23715.781250 / inertia_scale}" izz="${40896.656250 / inertia_scale}" />
 			</inertial>
-
 			<visual>
 				<origin xyz="0 0 0.0" rpy="0 0 ${M_PI}"/>
 				<geometry>
@@ -231,7 +229,7 @@
 			<origin xyz="0 0 0.20" rpy="0 0 0"/>
 			<axis xyz="0 0 1"/>
 			<limit lower="${-170 * M_PI / 180}" upper="${170 * M_PI / 180}" effort="100" velocity="${velocity_scale * 204 * M_PI / 180}" />
-			<dynamics friction="10.0" damping="1.0"/>
+			<dynamics friction="1.0" damping="0.7"/>
 			<parent link="${name}_4_link"/>
 			<child link="${name}_5_link"/>
 		</joint>
@@ -239,10 +237,9 @@
 		<link name="${name}_5_link">
 			<inertial>
 				<mass value="${link_mass}"/>
-				<origin rpy="0 0 0" xyz="0 0 0.124"/>
-				<cuboid_inertia_def length="0.12" width="0.06" height="0.248" mass="${link_mass}"/>
+				<origin rpy="0 0 0" xyz="-0.00000303 .02391175 0.08110597"/>
+			    <inertia ixx="${82625.953125 / inertia_scale}" ixy="${5.603518 / inertia_scale}" ixz="${8.553005 / inertia_scale}" iyy="${76228.593750 / inertia_scale}" iyz="${-24984.386719 / inertia_scale}" izz="${33607.035156 / inertia_scale}" />
 			</inertial>
-
 			<visual>
 				<origin xyz="0 0 -0.008" rpy="0 0 ${M_PI}"/>
 				<geometry name="${name}_5_geom">
@@ -276,7 +273,7 @@
 			<origin xyz="0 0 0.19" rpy="0 0 0"/>
 			<axis xyz="0 -1 0"/>
 			<limit lower="${-120 * M_PI / 180}" upper="${120 * M_PI / 180}" effort="38" velocity="${velocity_scale * 184 * M_PI / 180}" />
-			<dynamics friction="10.0" damping="1.0"/>
+			<dynamics friction="1.0" damping="0.7"/>
 			<parent link="${name}_5_link"/>
 			<child link="${name}_6_link"/>
 		</joint>
@@ -284,8 +281,8 @@
 		<link name="${name}_6_link">
 			<inertial>
 				<mass value="${wrist_mass}"/>
-				<origin rpy="0 0 0" xyz="0 0 0.0625"/>
-				<cuboid_inertia_def length="0.125" width="0.125" height="0.125" mass="${wrist_mass}"/>
+				<origin rpy="0 0 0" xyz="-0.00000001 -.00447585 -0.00290105"/>
+			    <inertia ixx="${29610.587891 / inertia_scale}" ixy="${-0.002319 / inertia_scale}" ixz="${0.023622 / inertia_scale}" iyy="${29691.074219 / inertia_scale}" iyz="${246.776962 / inertia_scale}" izz="${32060.654297 / inertia_scale}" />
 			</inertial>
 
 			<visual>
@@ -308,7 +305,7 @@
 			<origin xyz="0 0 0.078" rpy="0 0 0"/>
 			<axis xyz="0 0 1"/>
 			<limit lower="${-170 * M_PI / 180}" upper="${170 * M_PI / 180}" effort="38" velocity="${velocity_scale * 184 * M_PI / 180}" />
-			<dynamics friction="10.0" damping="1.0"/>
+			<dynamics friction="1.0" damping="0.7"/>
 			<parent link="${name}_6_link"/>
 			<child link="${name}_7_link"/>
 		</joint>
@@ -316,8 +313,8 @@
 		<link name="${name}_7_link">
 			<inertial>
 				<mass value="${tip_mass}"/>
-				<origin xyz="0 0 0"/>
-				<cuboid_inertia_def length="0.1" width="0.1" height="0.1" mass="${tip_mass}"/>
+				<origin rpy="0 0 0" xyz="-0.00000107 0.0 -0.01580145"/>
+			    <inertia ixx="${414.478149 / inertia_scale}" ixy="0.0" ixz="0.0" iyy="${414.478149 / inertia_scale}" iyz="0.0" izz="${694.374329 / inertia_scale}" />
 			</inertial>
 			<visual>
 				<origin xyz="0 0 0" rpy="0 0 ${M_PI}"/>
@@ -327,12 +324,12 @@
 			<material name="Kuka/DarkGrey"/>
 			</visual>
 
-<!-- 			<collision>
-			<origin xyz="0 0 0" rpy="0 0 ${M_PI}"/>
+			<collision>
+			<origin xyz="0 0 -0.005" rpy="0 0 ${M_PI}"/>
 			<geometry>
-				<cylinder radius="0.04" length="0.05"/>
+				<cylinder radius="0.04" length="0.01"/>
 			</geometry>
-			</collision> -->
+			</collision>
 		</link>
 
 		<xacro:kuka_lwr_gazebo name="${name}"/>
