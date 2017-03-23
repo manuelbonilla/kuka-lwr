@@ -134,7 +134,7 @@ namespace lwr_controllers
 	    	// computing S
 	    	S_.data = (joint_msr_states_.qdot.data - joint_des_states_.qdot.data) + alpha_.data.cwiseProduct(joint_msr_states_.q.data - joint_des_states_.q.data);
 
-			//for (int i = 0; i < joint_handles_.size(); i++)
+			//for (unsigned int i = 0; i < joint_handles_.size(); i++)
 				//S_(i) = (joint_msr_states_.qdot(i) - joint_des_states_.qdot(i)) + alpha_(i)*tanh(lambda_(i)*(joint_msr_states_.q(i) - joint_des_states_.q(i)));
 	    	
 	    	// saving S0 on the first step
@@ -142,19 +142,19 @@ namespace lwr_controllers
 	    		S0_ = S_;
 
 	    	// computing Sd
-	    	for (int i = 0; i < joint_handles_.size(); i++)
+	    	for (unsigned int i = 0; i < joint_handles_.size(); i++)
 	    		Sd_(i) = S0_(i)*exp(-k_(i)*(step_*period.toSec()));
 
 	    	Sq_.data = S_.data + Sd_.data;//- Sd_.data;
 
 	    	// computing sigma_dot as sgn(Sq)
-	    	for (int i = 0; i < joint_handles_.size(); i++)
+	    	for (unsigned int i = 0; i < joint_handles_.size(); i++)
 	    		sigma_dot_(i) = -(Sq_(i) < 0) + (Sq_(i) > 0); 
 
 	    	// integrating sigma_dot
 	    	sigma_.data += period.toSec()*sigma_dot_.data;
 
-	    	//for (int i = 0; i < joint_handles_.size(); i++)
+	    	//for (unsigned int i = 0; i < joint_handles_.size(); i++)
 	    		//sigma_(i) += period.toSec()*pow(Sq_(i),0.5);
 
 	    	// computing Sr
@@ -175,7 +175,7 @@ namespace lwr_controllers
 	    } 
 
     	// set controls for joints
-    	for (int i = 0; i < joint_handles_.size(); i++)
+    	for (unsigned int i = 0; i < joint_handles_.size(); i++)
     	{	
     		if (!cmd_flag_)
     			tau_(i) = PIDs_[i].computeCommand(joint_des_states_.q(i) - joint_msr_states_.q(i),period);//Kd_(i)*(alpha_(i)*(joint_des_states_.q(i) - joint_msr_states_.q(i)) + (joint_des_states_.qdot(i) - joint_msr_states_.qdot(i))) ;

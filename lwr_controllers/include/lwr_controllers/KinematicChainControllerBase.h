@@ -154,10 +154,10 @@ bool KinematicChainControllerBase<JI>::init(JI *robot, ros::NodeHandle &n)
     joint_limits_.center.resize(kdl_chain_.getNrOfJoints());
     int index;
 
-    for (int i = 0; i < kdl_chain_.getNrOfJoints() && link_; i++)
+    for (unsigned int i = 0; i < kdl_chain_.getNrOfJoints() && link_; i++)
     {
         joint_ = model.getJoint(link_->parent_joint->name);
-        if( joint_->type == 6 )
+        if( joint_->type == urdf::Joint::FIXED )
             continue;
         ROS_INFO("Getting limits for joint: %s", joint_->name.c_str());
         index = kdl_chain_.getNrOfJoints() - i - 1;

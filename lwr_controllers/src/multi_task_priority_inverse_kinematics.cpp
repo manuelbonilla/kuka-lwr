@@ -111,12 +111,12 @@ namespace lwr_controllers
 		    }
 
 		    // integrating q_dot -> getting q (Euler method)
-		    for (int i = 0; i < joint_handles_.size(); i++)
+		    for (unsigned int i = 0; i < joint_handles_.size(); i++)
 		    	joint_des_states_.q(i) += period.toSec()*joint_des_states_.qdot(i);			
     	}
 
     	// set controls for joints
-    	for (int i = 0; i < joint_handles_.size(); i++)
+    	for (unsigned int i = 0; i < joint_handles_.size(); i++)
     	{
     		tau_cmd_(i) = PIDs_[i].computeCommand(joint_des_states_.q(i) - joint_msr_states_.q(i),joint_des_states_.qdot(i) - joint_msr_states_.qdot(i),period);
     		joint_handles_[i].setCommand(tau_cmd_(i));

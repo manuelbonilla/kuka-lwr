@@ -103,7 +103,7 @@ namespace lwr_controllers
     	msg_traj_.data.clear();
 
     	// updating messages for plot visualization
-    	for (int i = 0; i < joint_handles_.size(); i++)
+    	for (unsigned int i = 0; i < joint_handles_.size(); i++)
     	{
     		msg_pose_.data.push_back(joint_msr_states_.q(i));
     		msg_traj_.data.push_back(joint_des_states_.q(i));
@@ -112,7 +112,7 @@ namespace lwr_controllers
     	// computing S
     	S_.data = (joint_msr_states_.qdot.data - joint_des_states_.qdot.data) + alpha_.data.cwiseProduct(joint_msr_states_.q.data - joint_des_states_.q.data);
 
-		//for (int i = 0; i < joint_handles_.size(); i++)
+		//for (unsigned int i = 0; i < joint_handles_.size(); i++)
 			//S_(i) = (joint_msr_states_.qdot(i) - joint_des_states_.qdot(i)) + alpha_(i)*tanh(lambda_(i)*(joint_msr_states_.q(i) - joint_des_states_.q(i)));
 
     	// saving S0 on the first step
@@ -120,13 +120,13 @@ namespace lwr_controllers
     		S0_ = S_;
 
     	// computing Sd
-    	for (int i = 0; i < joint_handles_.size(); i++)
+    	for (unsigned int i = 0; i < joint_handles_.size(); i++)
     		Sd_(i) = S0_(i)*exp(-k_(i)*(step_*period.toSec()));
 
     	Sq_.data = S_.data - Sd_.data;
 
     	// computing sigma_dot as sgn(Sq)
-    	for (int i = 0; i < joint_handles_.size(); i++)
+    	for (unsigned int i = 0; i < joint_handles_.size(); i++)
     		sigma_dot_(i) = -(Sq_(i) < 0) + (Sq_(i) > 0); 
 
     	// integrating sigma_dot
@@ -141,7 +141,7 @@ namespace lwr_controllers
     	step_++; 
 
     	// set controls for joints
-    	for (int i = 0; i < joint_handles_.size(); i++)
+    	for (unsigned int i = 0; i < joint_handles_.size(); i++)
     	{	
 	    	joint_handles_[i].setCommand(tau_(i));
     	}

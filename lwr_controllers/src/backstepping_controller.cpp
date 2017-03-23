@@ -175,7 +175,7 @@ namespace lwr_controllers
     	}
 
     	// set controls for joints
-    	for (int i = 0; i < joint_handles_.size(); i++)
+    	for (unsigned int i = 0; i < joint_handles_.size(); i++)
     	{
     		if(cmd_flag_)
     			joint_handles_[i].setCommand(tau_(i));
