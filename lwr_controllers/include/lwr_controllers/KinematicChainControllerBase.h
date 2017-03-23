@@ -157,6 +157,8 @@ bool KinematicChainControllerBase<JI>::init(JI *robot, ros::NodeHandle &n)
     for (int i = 0; i < kdl_chain_.getNrOfJoints() && link_; i++)
     {
         joint_ = model.getJoint(link_->parent_joint->name);
+        if( joint_->type == 6 )
+            continue;
         ROS_INFO("Getting limits for joint: %s", joint_->name.c_str());
         index = kdl_chain_.getNrOfJoints() - i - 1;
 
