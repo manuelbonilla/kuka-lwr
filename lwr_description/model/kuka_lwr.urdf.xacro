@@ -18,7 +18,7 @@
 	<xacro:property name="velocity_scale" value="1"/>
 	<xacro:property name="effort_scale" value="1"/>
 	<xacro:property name="use_extra_joints_default" value="true"/>
-	<xacro:property name="inertia_scale" value="10000000"/>
+	<xacro:property name="inertia_scale" value="10000000.0"/>
 
 	<!-- URDF model /-->
 	<xacro:macro name="kuka_lwr" params="parent name *origin use_extra_joints:=${use_extra_joints_default}">
@@ -313,8 +313,10 @@
 		<link name="${name}_7_link">
 			<inertial>
 				<mass value="${tip_mass}"/>
-				<origin rpy="0 0 0" xyz="-0.00000107 0.0 -0.01580145"/>
-			    <inertia ixx="${414.478149 / inertia_scale}" ixy="0.0" ixz="0.0" iyy="${414.478149 / inertia_scale}" iyz="0.0" izz="${694.374329 / inertia_scale}" />
+			    <origin xyz="0 0 -0.014685" rpy="0 0 0"/>
+			    <!-- <inertia ixx="${414.478149 / inertia_scale}" ixy="0.0" ixz="0.0" iyy="${414.478149 / inertia_scale}" iyz="0.0" izz="${694.374329 / inertia_scale}" /> -->
+        		<!-- <inertia ixx="${2 * tip_mass * 0.1 * 0.1 / 5}"  ixy="0"  ixz="0" iyy="${2 * tip_mass * 0.1 * 0.1 / 5}" iyz="0" izz="${2 * tip_mass * 0.1 * 0.1 / 5}" /> -->
+        		<inertia ixx="${1 / 12  * (3 * 0.05 * 0.05 + 0.01 * 0.01)}"  ixy="0"  ixz="0" iyy="${1 / 12  * (3 * 0.05 * 0.05 + 0.01 * 0.01)}" iyz="0" izz="${1 / 12  * (3 * 0.05 * 0.05 + 0.01 * 0.01)}" />
 			</inertial>
 			<visual>
 				<origin xyz="0 0 0" rpy="0 0 ${M_PI}"/>
@@ -323,13 +325,13 @@
 				</geometry>
 			<material name="Kuka/DarkGrey"/>
 			</visual>
-
+<!-- 
 			<collision>
 			<origin xyz="0 0 -0.005" rpy="0 0 ${M_PI}"/>
 			<geometry>
 				<cylinder radius="0.04" length="0.01"/>
 			</geometry>
-			</collision>
+			</collision> -->
 		</link>
 
 		<xacro:kuka_lwr_gazebo name="${name}"/>
